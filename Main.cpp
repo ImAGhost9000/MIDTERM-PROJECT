@@ -7,9 +7,9 @@ using namespace std;
 
 
 struct ReadInstruction{
-    string operand;
-    int op1;
-    int op2;
+    string operation;
+    string op1;
+    string op2;
 };
 
 class Memory{
@@ -93,7 +93,6 @@ class Processor{
         READ = 1100,
         HALT = 1101,
     };
-    
 
     void Read(){
         ifstream readFile;
@@ -112,25 +111,104 @@ class Processor{
     }
 
     void FetchDecodeExecute(){
-        PC = MM.start_data_address_m;
+        PC = MM.start_instr_address_m;
         ReadInstruction Decode;
         while(address_count >= 0){
             IR = PC;
             string CurrInstr = MM.fetchMemory(IR);     //fetch
             istringstream iss(CurrInstr);
 
-            iss >> Decode.operand >> Decode.op1 >> Decode.op2;
+            iss >> Decode.operation >> Decode.op1 >> Decode.op2;
 
-            Execute(Decode.operand,Decode.op1,Decode.op2);
+            execute(Decode);
 
+            address_count--;
             PC++;
         }
     }
 
-    void Execute(string operand, int op1, int op2){
-        cout << operand << op1 << op2;
+    void execute(ReadInstruction Decode){
+        int opcode = DecodeInstructions(Decode.operation);
+
+        switch(opcode){
+            case LOAD:
+                cout << "This is a LOAD statement" << endl;
+                break; 
+            case STORE:
+                cout << "This is a STORE statement" << endl;
+                break;
+            case CLEAR:
+                cout << "This is a CLEAR statement" << endl;
+                break;
+            case ADD:
+                cout << "This is a ADD statement" << endl;
+                break;
+            case SUB:
+                cout << "This is a SUB statement" << endl;
+                break;
+            case MUL:
+                cout << "This is a MUL statement" << endl;
+                break;
+            case DIV:
+                cout << "This is a DIV statement" << endl;
+                break;
+            case INC:
+                cout << "This is a INC statement" << endl;
+                break;
+            case DEC:
+                cout << "This is a DEC statement" << endl;
+                break;
+            case CMP:
+                cout << "This is a CMP statement" << endl;
+                break;
+            case PRINT:
+                cout << "This is a PRINT statement" << endl;
+                break;
+            case READ:
+                cout << "This is a READ statement" << endl;
+                break;
+            case HALT:
+                cout << "This is a HALT statement" << endl;
+                break;
+            default:
+                cout << "ERROR" << endl;
+                break;
+        }
     }
+
+    Processor::Instructions DecodeInstructions(string oper){
+        if(oper == "LOAD"){
+            return Processor::LOAD;
+        } else if (oper == "STORE"){
+            return Processor::STORE;
+        } else if (oper == "CLEAR"){
+            return Processor::CLEAR;
+        } else if (oper == "ADD"){
+            return Processor::ADD;
+        } else if (oper == "SUB"){
+            return Processor::SUB;
+        } else if (oper == "MUL"){
+            return Processor::MUL;
+        } else if (oper == "DIV"){
+            return Processor::DIV;
+        } else if (oper == "INC"){
+            return Processor::INC;
+        } else if (oper == "DEC"){
+            return Processor::DEC;
+        } else if (oper == "CMP"){
+            return Processor::CMP;
+        } else if (oper == "PRINT"){
+            return Processor::PRINT;
+        } else if (oper == "READ"){
+            return Processor::READ;
+        } else if (oper == "HALT"){
+            return Processor::HALT;
+        } else {
+            return Processor::HALT;
+        }
+    }    
 };
+
 
 int main(){
     Processor CPU;
