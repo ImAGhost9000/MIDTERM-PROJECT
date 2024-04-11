@@ -5,13 +5,12 @@
 #include<string>
 using namespace std;
 
-/*
-struct Memory{
+
+struct ReadInstruction{
     string operand;
-    string op1;
-    string op2;
+    int op1;
+    int op2;
 };
-*/
 
 class Memory{
     public:
@@ -56,13 +55,28 @@ class Processor{
     public:
     
     int PC,IR,AC; //Special Registers
-    int R0,R1,R2,R3,R4,R5,R6,R7,R8; // General Registers
+    int R0,R1,R2,R3,R4,R5,R6,R7; // General Registers
+    int address_count;
     Memory MM;
 
     Processor(){
+        address_count = 0;
         PC = IR = AC = 0;
-        R0 = R1 = R2 = R3 = R4 = R6 = R7 = R8 = 0;
+        R0 = R1 = R2 = R3 = R4 = R6 = R7 = 0;
     }
+
+    /*
+    enum Registers{
+        R0 = 0x00,
+        R1 = 0x01,
+        R2 = 0x02,
+        R3 = 0x03,
+        R4 = 0x04,
+        R5 = 0x05,
+        R6 = 0x06,
+        R7 = 0x07,
+    };
+    */
 
     enum Instructions {
         LOAD = 0000,
@@ -79,6 +93,7 @@ class Processor{
         READ = 1100,
         HALT = 1101,
     };
+    
 
     void Read(){
         ifstream readFile;
@@ -89,20 +104,36 @@ class Processor{
         while(getline(readFile,temp)){
             MM.storeMemory(temp,PC);
             PC++;
+            address_count++;
         }
 
         cout << "Instructions Read" << endl;
         MM.displayMemory();
     }
 
-    void Execute(){
-        string opcode;
-        string op1;
-        string op2;
+    void FetchDecodeExecute(){
+        PC = MM.start_data_address_m;
+        ReadInstruction Decode;
+        while(address_count >= 0){
+            IR = PC;
+            string CurrInstr = MM.fetchMemory(IR);     //fetch
+            istringstream iss(CurrInstr);
+
+            iss >> Decode.operand >> Decode.op1 >> Decode.op2;
+
+            Execute(Decode.operand,Decode.op1,Decode.op2);
+
+            PC++;
+        }
+    }
+
+    void Execute(string operand, int op1, int op2){
+        cout << operand << op1 << op2;
     }
 };
 
 int main(){
     Processor CPU;
     CPU.Read();
+    CPU.FetchDecodeExecute();
 }
